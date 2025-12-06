@@ -1,10 +1,11 @@
 import os
 from datetime import datetime
-from functools import wraps
 from pathlib import Path
 from flask import Flask, render_template, request, send_file, jsonify, redirect, url_for, Response
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from src.auth import auth_required
+from src.planning import planning_bp
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
@@ -14,7 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///zgrany_budget.db'
 
 db = SQLAlchemy(app)
 
-from expenses import expenses_bp
+from src.expenses import expenses_bp
 app.register_blueprint(expenses_bp, url_prefix='/expenses')
 
 
@@ -22,29 +23,6 @@ app.register_blueprint(expenses_bp, url_prefix='/expenses')
 app.config['UPLOAD_FOLDER'].mkdir(parents=True, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {'xlsx', 'pdf'}
-
-
-def check_auth(username, password):
-    """Check if a username/password combination is valid."""
-    return username == 'knurr' and password == 'oink1234'
-
-
-def authenticate():
-    """Sends a 401 response that enables basic auth"""
-    return Response(
-        'Could not verify your access level for that URL.\n'
-        'You have to login with proper credentials', 401,
-        {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
-
-def auth_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        auth = request.authorization
-        if not auth or not check_auth(auth.username, auth.password):
-            return authenticate()
-        return f(*args, **kwargs)
-    return decorated
 
 def get_uploaded_files():
     """Get list of uploaded files with metadata."""
@@ -68,11 +46,8 @@ def get_uploaded_files():
 
 
 
-@app.route("/")
-@auth_required
-def main_page():
-    """Render the main page."""
-    return render_template('main_page.html')
+from src.planning import planning_bp
+app.register_blueprint(planning_bp, url_prefix='/')
 
 @app.route("/health")
 def health():

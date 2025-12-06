@@ -4,8 +4,13 @@ expenses_bp = Blueprint('expenses', __name__)
 
 EXPENSES = []
 
+from src.planning import planning_state
+
 @expenses_bp.route('/add', methods=['GET', 'POST'])
 def add_expense():
+    if not planning_state.is_open:
+        return "Proces planowania jest zamknięty.", 403
+
     if request.method == 'POST':
         expense = {
             'chapter': request.form.get('chapter'),
