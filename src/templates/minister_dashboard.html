@@ -32,6 +32,8 @@
                 <td>{{ office.total_needs }}</td>
                 <td>
                     <button class="outline" onclick="toggleDetails('{{ office.name }}')">Pokaż szczegóły</button>
+                    <button class="outline" onclick="acceptOfficeExpenses('{{ office.name }}')">TAK</button>
+                    <button class="outline" onclick="rejectOfficeExpenses('{{ office.name }}')">NIE</button>
                 </td>
             </tr>
             <tr id="details-{{ office.name }}" style="display: none;">
@@ -45,7 +47,6 @@
                                     <th scope="col">Rozdział</th>
                                     <th scope="col">Nazwa zadania</th>
                                     <th scope="col">Kwota (PLN)</th>
-                                    <th scope="col">Akcje</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,17 +55,6 @@
                                     <td>{{ expense.chapter }}</td>
                                     <td>{{ expense.task_name }}</td>
                                     <td>{{ expense.financial_needs }}</td>
-                                    <td>
-                                        {% if expense.status == null %}
-                                        <button class="outline"
-                                            onclick="acceptExpense('{{ expense.task_name }}')">TAK</button>
-                                        <button class="outline"
-                                            onclick="rejectExpense('{{ expense.task_name }}')">NIE</button>
-                                        {% else %}
-                                        <strong>{{ expense.status }}</strong>
-                                        {% endif %}
-
-                                    </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -94,17 +84,6 @@
             } else {
                 detailsRow.style.display = 'none';
             }
-        }
-
-        function acceptExpense(expenseName, officeName) {
-
-            var expenseRow = document.getElementById('expense-' + expenseName);
-            expenseRow.style.display = 'none';
-        }
-
-        function rejectExpense(expenseName, officeName) {
-            var expenseRow = document.getElementById('expense-' + expenseName);
-            expenseRow.style.display = 'none';
         }
     </script>
 </article>
