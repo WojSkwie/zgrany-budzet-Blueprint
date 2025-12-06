@@ -9,11 +9,6 @@ Then run:
 poetry install
 ```
 
-## Setting up the database
-```
-make init
-```
-
 ## Running the Application
 
 Just 

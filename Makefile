@@ -1,6 +1,3 @@
-init:
-	poetry run python src/init_db.py
-
 debug:
 	cd src && poetry run python -m flask --app main run --debug
 
