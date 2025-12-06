@@ -29,18 +29,16 @@
 
         <article>
             <header>Zarządzanie</header>
-            <form method="POST">
-                <label for="deadline">Ustaw termin</label>
-                <input type="date" id="deadline" name="deadline" value="{{ state.deadline }}">
-                <button type="submit" name="action" value="set_deadline">Zapisz termin</button>
-            </form>
-
             <div class="grid">
                 <form method="POST">
+                    <label for="deadline">Ustaw termin</label>
+                    <input type="date" id="deadline" name="deadline" value="{{ state.deadline }}" required>
                     <button type="submit" name="action" value="open" {% if state.is_open %}disabled{% endif %}>Otwórz
                         proces</button>
                 </form>
-                <form method="POST">
+
+                <form method="POST" style="align-self: end;">
+                    <label>&nbsp;</label> <!-- Spacer for alignment -->
                     <button type="submit" name="action" value="close" class="secondary" {% if not state.is_open
                         %}disabled{% endif %}>Zamknij proces</button>
                 </form>

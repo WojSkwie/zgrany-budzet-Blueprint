@@ -25,11 +25,11 @@ planning_state = PlanningState()
 def dashboard():
     if request.method == 'POST':
         action = request.form.get('action')
-        if action == 'set_deadline':
+        if action == 'open':
             deadline = request.form.get('deadline')
-            planning_state.set_deadline(deadline)
-        elif action == 'open':
-            planning_state.open_process()
+            if deadline:
+                planning_state.set_deadline(deadline)
+                planning_state.open_process()
         elif action == 'close':
             planning_state.close_process()
         return redirect(url_for('planning.dashboard'))
