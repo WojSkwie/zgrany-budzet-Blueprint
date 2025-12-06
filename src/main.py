@@ -12,6 +12,7 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['UPLOAD_FOLDER'] = Path(__file__).parent / 'static' / 'uploads'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///zgrany_budget.db'
+app.secret_key = 'super_secret_key_for_demo_only'
 
 
 db.init_app(app)

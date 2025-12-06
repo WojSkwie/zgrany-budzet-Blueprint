@@ -1,33 +1,50 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 
 expenses_bp = Blueprint('expenses', __name__)
 
-EXPENSES = []
-EXPENSES_CLOSED = False
+EXPENSES = {
+    'office1': [],
+    'office2': []
+}
+EXPENSES_CLOSED = {
+    'office1': False,
+    'office2': False
+}
 
 from src.planning import planning_state
 
 @expenses_bp.route('/add', methods=['GET', 'POST'])
 def add_expense():
-    if EXPENSES_CLOSED or not planning_state.is_open:
+    print(session)
+    print(session['role'])
+    if 'role' not in session or session['role'] not in ['office1', 'office2']:
+        return redirect(url_for('planning.index'))
+
+    if EXPENSES_CLOSED[session['role']] or not planning_state.is_open:
         return redirect(url_for('expenses.list_expenses'))
         
     if request.method == 'POST':
         expense = {
             'chapter': request.form.get('chapter'),
             'task_name': request.form.get('task_name'),
-            'financial_needs': request.form.get('financial_needs')
+            'financial_needs': request.form.get('financial_needs'),
+            'role': session['role']
         }
-        EXPENSES.append(expense)
+        EXPENSES[session['role']].append(expense)
         return redirect(url_for('expenses.list_expenses'))
     return render_template('add_expense.html')
 
 @expenses_bp.route('/close', methods=['POST'])
 def close_expenses():
-    global EXPENSES_CLOSED
-    EXPENSES_CLOSED = True
+    if 'role' in session and session['role'] in EXPENSES_CLOSED:
+        EXPENSES_CLOSED[session['role']] = True
     return redirect(url_for('expenses.list_expenses'))
 
 @expenses_bp.route('/')
 def list_expenses():
-    return render_template('expenses_list.html', expenses=EXPENSES, closed=EXPENSES_CLOSED)
+    if 'role' not in session or session['role'] not in ['office1', 'office2']:
+        return redirect(url_for('planning.index'))
+    return render_template('expenses_list.html', 
+                         expenses=EXPENSES[session['role']], 
+                         closed=EXPENSES_CLOSED[session['role']],
+                         is_open=planning_state.is_open)

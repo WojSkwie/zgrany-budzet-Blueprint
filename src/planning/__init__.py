@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from src.auth import auth_required
 
 planning_bp = Blueprint('planning', __name__)
@@ -20,9 +20,9 @@ class PlanningState:
 # Singleton instance
 planning_state = PlanningState()
 
-@planning_bp.route('/', methods=['GET', 'POST'])
+@planning_bp.route('/chief_dashboard', methods=['GET', 'POST'])
 @auth_required
-def dashboard():
+def chief_dashboard():
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'open':
@@ -32,6 +32,21 @@ def dashboard():
                 planning_state.open_process()
         elif action == 'close':
             planning_state.close_process()
-        return redirect(url_for('planning.dashboard'))
+        return redirect(url_for('planning.chief_dashboard'))
     
     return render_template('chief_dashboard.html', state=planning_state)
+
+@planning_bp.route('/')
+def index():
+    return render_template('role_selection.html')
+
+@planning_bp.route('/set_role', methods=['POST'])
+def set_role():
+    role = request.form.get('role')
+    if role:
+        session['role'] = role
+        if role == 'chief':
+            return redirect(url_for('planning.chief_dashboard'))
+        elif role in ['office1', 'office2']:
+            return redirect(url_for('expenses.list_expenses'))
+    return redirect(url_for('planning.index'))

@@ -31,11 +31,16 @@
                 </tbody>
             </table>
         </figure>
-        {% if not closed %}
+        {% if not closed and is_open %}
         <a href="/expenses/add" role="button">Dodaj nowy wydatek</a>
         <form action="/expenses/close" method="POST" style="display: inline;">
             <button type="submit" class="contrast">Zamknij listę</button>
         </form>
+        {% elif not is_open %}
+        <article>
+            <header>Proces planowania nie został otwarty</header>
+            Dyrektor (Chief) musi otworzyć proces planowania, zanim będzie można dodawać wydatki.
+        </article>
         {% else %}
         <article>
             <header>Status</header>
