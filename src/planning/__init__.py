@@ -1,42 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from src.auth import auth_required
+from .planning_workflow import PlanningState, PlanningStatus
 # from src.expenses import EXPENSES, EXPENSES_CLOSED # Moved to inside functions to avoid circular import
 
 planning_bp = Blueprint('planning', __name__)
 
-from enum import Enum
-
-class PlanningStatus(Enum):
-    NOT_STARTED = "planning_not_started"
-    IN_PROGRESS = "planning_in_progress"
-    IN_REVIEW = "in_review_by_minister"
-    CORRECTION = "correction_in_progress"
-
-class PlanningState:
-    def __init__(self):
-        self.deadline = None
-        self.status = PlanningStatus.NOT_STARTED
-
-    def set_deadline(self, date_str):
-        self.deadline = date_str
-
-    def start_planning(self):
-        self.status = PlanningStatus.IN_PROGRESS
-
-    def submit_to_minister(self):
-        self.status = PlanningStatus.IN_REVIEW
-
-    def request_correction(self):
-        self.status = PlanningStatus.CORRECTION
-        # Side effect: Reset office approvals
-        from src.expenses import EXPENSES_CLOSED
-        for office in EXPENSES_CLOSED:
-            EXPENSES_CLOSED[office] = False
-
-    def submit_correction(self):
-        self.status = PlanningStatus.IN_REVIEW
-
-# Singleton instance
+# Singleton instance of PlanningState - will be stored in db later
 planning_state = PlanningState()
 
 @planning_bp.route('/chief_dashboard', methods=['GET', 'POST'])
@@ -54,8 +23,10 @@ def chief_dashboard():
             planning_state.submit_to_minister()
         elif action == 'request_correction':
             planning_state.request_correction()
-        elif action == 'submit_correction':
-            planning_state.submit_correction()
+        elif action == 'approve':
+            planning_state.approve()
+        elif action == 'reopen':
+            planning_state.reopen()
             
         return redirect(url_for('planning.chief_dashboard'))
     
