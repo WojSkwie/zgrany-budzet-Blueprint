@@ -63,7 +63,7 @@ def get_uploaded_files():
 
 
 
-@app.route("/MainPage")
+@app.route("/")
 @auth_required
 def main_page():
     """Render the main page."""

@@ -1,3 +1,6 @@
+debug:
+	cd src && poetry run python -m flask --app main run --debug
+
 run:
 	cd src && poetry run python -m flask --app main run
 
