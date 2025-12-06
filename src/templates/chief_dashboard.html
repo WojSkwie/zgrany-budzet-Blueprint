@@ -47,6 +47,7 @@
                 <th scope="col">Status</th>
                 <th scope="col">Liczba zadań</th>
                 <th scope="col">Suma potrzeb (PLN)</th>
+                <th scope="col">Akcje</th>
             </tr>
         </thead>
         <tbody>
@@ -62,10 +63,60 @@
                 </td>
                 <td>{{ office.task_count }}</td>
                 <td>{{ office.total_needs }}</td>
+                <td>
+                    <button class="outline" onclick="toggleDetails('{{ office.name }}')">Pokaż szczegóły</button>
+                </td>
+            </tr>
+            <tr id="details-{{ office.name }}" style="display: none;">
+                <td colspan="5">
+                    <article>
+                        <header>Wydatki - {{ office.name }}</header>
+                        {% if office.expenses %}
+                        <table role="grid">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Rozdział</th>
+                                    <th scope="col">Nazwa zadania</th>
+                                    <th scope="col">Kwota (PLN)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in office.expenses %}
+                                <tr>
+                                    <td>{{ expense.chapter }}</td>
+                                    <td>{{ expense.task_name }}</td>
+                                    <td>{{ expense.financial_needs }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p>Brak wydatków.</p>
+                        {% endif %}
+                    </article>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
+        <tfoot>
+            <tr>
+                <th scope="row" colspan="3">Suma całkowita</th>
+                <td><strong>{{ total_all_needs }}</strong></td>
+                <td></td>
+            </tr>
+        </tfoot>
     </table>
+
+    <script>
+        function toggleDetails(officeName) {
+            var detailsRow = document.getElementById('details-' + officeName);
+            if (detailsRow.style.display === 'none') {
+                detailsRow.style.display = 'table-row';
+            } else {
+                detailsRow.style.display = 'none';
+            }
+        }
+    </script>
 </article>
 
 <a href="/expenses">Lista Wydatków</a>

@@ -37,20 +37,24 @@ def chief_dashboard():
     from src.expenses import EXPENSES, EXPENSES_CLOSED
     
     offices_status = []
+    total_all_needs = 0
     for office in ['office1', 'office2']:
         expenses = EXPENSES.get(office, [])
         total_needs = sum(e['financial_needs'] for e in expenses if e['financial_needs'] is not None)
         task_count = len(expenses)
         is_submitted = EXPENSES_CLOSED.get(office, False)
         
+        total_all_needs += total_needs
+
         offices_status.append({
             'name': office,
             'status': 'Submitted' if is_submitted else 'Open',
             'total_needs': total_needs,
-            'task_count': task_count
+            'task_count': task_count,
+            'expenses': expenses
         })
 
-    return render_template('chief_dashboard.html', state=planning_state, offices_status=offices_status)
+    return render_template('chief_dashboard.html', state=planning_state, offices_status=offices_status, total_all_needs=total_all_needs)
 
 @planning_bp.route('/')
 def index():
