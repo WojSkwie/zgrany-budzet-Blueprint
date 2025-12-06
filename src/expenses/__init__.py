@@ -44,9 +44,10 @@ def close_expenses():
 def list_expenses():
     if 'role' not in session or session['role'] not in ['office1', 'office2']:
         return redirect(url_for('planning.index'))
-    expenses_sum = sum(expense['financial_needs'] for expense in EXPENSES)
-    return render_template('expenses_list.html',
-                         expenses=EXPENSES[session['role']], 
+    current_expenses = EXPENSES[session['role']]
+    expenses_sum = sum(e['financial_needs'] for e in current_expenses if e['financial_needs'] is not None)
+    return render_template('expenses_list.html', 
+                         expenses=current_expenses, 
                          closed=EXPENSES_CLOSED[session['role']],
                          is_open=planning_state.is_open,
                          expenses_sum=expenses_sum)
