@@ -11,14 +11,17 @@ EXPENSES_CLOSED = {
     'office2': False
 }
 
-from src.planning import planning_state
+from src.planning import planning_state, PlanningStatus
 
 @expenses_bp.route('/add', methods=['GET', 'POST'])
 def add_expense():
     if 'role' not in session or session['role'] not in ['office1', 'office2']:
         return redirect(url_for('planning.index'))
 
-    if EXPENSES_CLOSED[session['role']] or not planning_state.is_open:
+    # Allow editing if status is IN_PROGRESS or CORRECTION
+    can_edit = planning_state.status in [PlanningStatus.IN_PROGRESS, PlanningStatus.CORRECTION]
+    
+    if EXPENSES_CLOSED[session['role']] or not can_edit:
         return redirect(url_for('expenses.list_expenses'))
         
     if request.method == 'POST':
@@ -34,7 +37,9 @@ def add_expense():
 
 @expenses_bp.route('/close', methods=['POST'])
 def close_expenses():
-    if not planning_state.is_open:
+    can_edit = planning_state.status in [PlanningStatus.IN_PROGRESS, PlanningStatus.CORRECTION]
+    
+    if not can_edit:
         return redirect(url_for('expenses.list_expenses'))
         
     if 'role' in session and session['role'] in EXPENSES_CLOSED:
@@ -50,5 +55,6 @@ def list_expenses():
     return render_template('expenses_list.html', 
                          expenses=current_expenses, 
                          closed=EXPENSES_CLOSED[session['role']],
-                         is_open=planning_state.is_open,
+                         state=planning_state,
+                         PlanningStatus=PlanningStatus,
                          expenses_sum=expenses_sum)

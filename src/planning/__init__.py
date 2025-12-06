@@ -1,21 +1,40 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from src.auth import auth_required
+# from src.expenses import EXPENSES, EXPENSES_CLOSED # Moved to inside functions to avoid circular import
 
 planning_bp = Blueprint('planning', __name__)
+
+from enum import Enum
+
+class PlanningStatus(Enum):
+    NOT_STARTED = "planning_not_started"
+    IN_PROGRESS = "planning_in_progress"
+    IN_REVIEW = "in_review_by_minister"
+    CORRECTION = "correction_in_progress"
 
 class PlanningState:
     def __init__(self):
         self.deadline = None
-        self.is_open = False
+        self.status = PlanningStatus.NOT_STARTED
 
     def set_deadline(self, date_str):
         self.deadline = date_str
 
-    def open_process(self):
-        self.is_open = True
+    def start_planning(self):
+        self.status = PlanningStatus.IN_PROGRESS
 
-    def close_process(self):
-        self.is_open = False
+    def submit_to_minister(self):
+        self.status = PlanningStatus.IN_REVIEW
+
+    def request_correction(self):
+        self.status = PlanningStatus.CORRECTION
+        # Side effect: Reset office approvals
+        from src.expenses import EXPENSES_CLOSED
+        for office in EXPENSES_CLOSED:
+            EXPENSES_CLOSED[office] = False
+
+    def submit_correction(self):
+        self.status = PlanningStatus.IN_REVIEW
 
 # Singleton instance
 planning_state = PlanningState()
@@ -25,17 +44,22 @@ planning_state = PlanningState()
 def chief_dashboard():
     if request.method == 'POST':
         action = request.form.get('action')
-        if action == 'open':
+        
+        if action == 'start':
             deadline = request.form.get('deadline')
             if deadline:
                 planning_state.set_deadline(deadline)
-                planning_state.open_process()
-        elif action == 'close':
-            planning_state.close_process()
+                planning_state.start_planning()
+        elif action == 'submit_minister':
+            planning_state.submit_to_minister()
+        elif action == 'request_correction':
+            planning_state.request_correction()
+        elif action == 'submit_correction':
+            planning_state.submit_correction()
+            
         return redirect(url_for('planning.chief_dashboard'))
     
     from src.expenses import EXPENSES, EXPENSES_CLOSED
-    
     offices_status = []
     total_all_needs = 0
     for office in ['office1', 'office2']:
@@ -54,7 +78,7 @@ def chief_dashboard():
             'expenses': expenses
         })
 
-    return render_template('chief_dashboard.html', state=planning_state, offices_status=offices_status, total_all_needs=total_all_needs)
+    return render_template('chief_dashboard.html', state=planning_state, offices_status=offices_status, total_all_needs=total_all_needs, PlanningStatus=PlanningStatus)
 
 @planning_bp.route('/minister_dashboard', methods=['GET', 'POST'])
 @auth_required

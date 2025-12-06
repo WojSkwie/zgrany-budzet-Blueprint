@@ -7,25 +7,36 @@
 
 <article>
     <header>Status</header>
-    {% if state.is_open %}
-    <strong style="color: green;">PLANOWANIE TRWA</strong>
-
-    <hr />
-    <div class="grid">
-        <p>Termin: <strong>{{ state.deadline if state.deadline else 'Nie ustawiono' }}</strong></p>
-        <form method="POST">
-            <button type="submit" name="action" value="close" class="secondary" {% if not state.is_open %}disabled{%
-                endif %}>Zamknij proces</button>
-        </form>
-    </div>
-    {% else %}
-    <strong style="color: red;">PLANOWANIE ZAMKNIĘTE</strong>
+    <header>Status</header>
+    {% if state.status == PlanningStatus.NOT_STARTED %}
+    <strong style="color: gray;">PLANOWANIE NIE ROZPOCZĘTE</strong>
     <hr />
     <form method="POST" class="grid">
         <label for="deadline">Ustaw termin</label>
         <input type="date" id="deadline" name="deadline" value="{{ state.deadline }}" required>
-        <button type="submit" name="action" value="open" {% if state.is_open %}disabled{% endif %}>Otwórz
-            proces</button>
+        <button type="submit" name="action" value="start">Rozpocznij planowanie</button>
+    </form>
+    {% elif state.status == PlanningStatus.IN_PROGRESS %}
+    <strong style="color: green;">PLANOWANIE W TOKU</strong>
+    <p>Termin: <strong>{{ state.deadline if state.deadline else 'Nie ustawiono' }}</strong></p>
+    <hr />
+    <form method="POST">
+        <button type="submit" name="action" value="submit_minister" class="primary">Przekaż do Ministra</button>
+    </form>
+    {% elif state.status == PlanningStatus.IN_REVIEW %}
+    <strong style="color: orange;">W PRZEGLĄDZIE U MINISTRA</strong>
+    <p>Termin: <strong>{{ state.deadline if state.deadline else 'Nie ustawiono' }}</strong></p>
+    <hr />
+    <form method="POST">
+        <button type="submit" name="action" value="request_correction" class="secondary">Zleć korektę</button>
+    </form>
+    {% elif state.status == PlanningStatus.CORRECTION %}
+    <strong style="color: red;">KOREKTA W TOKU</strong>
+    <p>Termin: <strong>{{ state.deadline if state.deadline else 'Nie ustawiono' }}</strong></p>
+    <hr />
+    <form method="POST">
+        <button type="submit" name="action" value="submit_correction" class="primary">Przekaż korektę do
+            Ministra</button>
     </form>
     {% endif %}
 </article>
