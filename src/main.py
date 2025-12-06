@@ -1,9 +1,10 @@
+from schema.schema import Section
 import os
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, render_template, request, send_file, jsonify, redirect, url_for, Response
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
+from extensions import db
 from src.auth import auth_required
 from src.planning import planning_bp
 
@@ -13,7 +14,7 @@ app.config['UPLOAD_FOLDER'] = Path(__file__).parent / 'static' / 'uploads'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///zgrany_budget.db'
 
 
-db = SQLAlchemy(app)
+db.init_app(app)
 
 from src.expenses import expenses_bp
 app.register_blueprint(expenses_bp, url_prefix='/expenses')
@@ -52,6 +53,12 @@ app.register_blueprint(planning_bp, url_prefix='/')
 @app.route("/health")
 def health():
     return "OK", 200
+
+@app.route("/fragment/section/chapter")
+def sections():
+    chapter_id = request.args.get('chapter')
+    sections = db.session.query(Section).filter_by(ChapterId=chapter_id).all()
+    return render_template('sectionTemplate.html', sections=sections)
 
 
 if __name__ == '__main__':
