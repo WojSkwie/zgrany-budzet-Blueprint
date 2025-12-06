@@ -1,53 +1,38 @@
-<!DOCTYPE html>
-<html lang="pl">
+{% extends "base.html" %}
 
+{% block title %}Dodaj Wydatek{% endblock %}
+{% block content %}
+<h1>Dodaj Wydatek</h1>
+<form method="POST">
+    <label for="chapter">
+        Dział
+        <select id="chapter" name="chapter" hx-get="/fragment/section/chapter" hx-target="#section" required>
+            <option value="" selected disabled>Wybierz dział</option>
+            <option value="750">Administracja i bezpieczeństwo</option>
+            <option value="801">Edukacja i wychowanie</option>
+            <option value="851">Ochrona zdrowia</option>
+        </select>
+    </label>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dodaj Wydatek</title>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-</head>
+    <label for="section">
+        Rozdział
+        <select id="section" name="section" required>
+            <option value="" selected disabled>Wybierz rozdział</option>
 
-<body>
-    <main class="container">
-        <h1>Dodaj Wydatek</h1>
-        <form method="POST">
-            <label for="chapter">
-                Dział
-                <select id="chapter" name="chapter" hx-get="/fragment/section/chapter" hx-target="#section" required>
-                    <option value="" selected disabled>Wybierz dział</option>
-                    <option value="750">Administracja i bezpieczeństwo</option>
-                    <option value="801">Edukacja i wychowanie</option>
-                    <option value="851">Ochrona zdrowia</option>
-                </select>
-            </label>
+        </select>
+    </label>
 
-            <label for="section">
-                Rozdział
-                <select id="section" name="section" required>
-                    <option value="" selected disabled>Wybierz rozdział</option>
+    <label for="task_name">
+        Nazwa zadania
+        <input type="text" id="task_name" name="task_name" placeholder="Np. Zakup materiałów biurowych" required>
+    </label>
 
-                </select>
-            </label>
+    <label for="financial_needs">
+        Potrzeby finansowe (PLN)
+        <input type="number" id="financial_needs" name="financial_needs" placeholder="0" min="0" step="1" required>
+    </label>
 
-            <label for="task_name">
-                Nazwa zadania
-                <input type="text" id="task_name" name="task_name" placeholder="Np. Zakup materiałów biurowych"
-                    required>
-            </label>
-
-            <label for="financial_needs">
-                Potrzeby finansowe (PLN)
-                <input type="number" id="financial_needs" name="financial_needs" placeholder="0" min="0" step="1"
-                    required>
-            </label>
-
-            <button type="submit">Dodaj</button>
-        </form>
-        <a href="/">Powrót do strony głównej</a>
-    </main>
-</body>
-
-</html>
+    <button type="submit">Dodaj</button>
+</form>
+<a href="/">Powrót do strony głównej</a>
+{% endblock %}

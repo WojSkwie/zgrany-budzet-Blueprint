@@ -1,62 +1,52 @@
-<!DOCTYPE html>
-<html lang="pl">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista Wydatków</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
-</head>
+{% block title %}Lista Wydatków{% endblock %}
 
-<body>
-    <main class="container">
-        <h1>Lista Wydatków</h1>
-        <figure>
-            <table role="grid">
-                <thead>
-                    <tr>
-                        <th scope="col">Rozdział</th>
-                        <th scope="col">Nazwa zadania</th>
-                        <th scope="col">Potrzeby finansowe (PLN)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for expense in expenses %}
-                    <tr>
-                        <td>{{ expense.chapter }}</td>
-                        <td>{{ expense.task_name }}</td>
-                        <td>{{ expense.financial_needs }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                {% if expenses_sum %}
-                <tfoot>
-                    <tr>
-                        <td colspan="2">Suma</td>
-                        <td>{{ expenses_sum }}</td>
-                    </tr>
-                </tfoot>
-                {% endif %}
-            </table>
-        </figure>
-        {% if not closed and is_open %}
-        <a href="/expenses/add" role="button">Dodaj nowy wydatek</a>
-        <form action="/expenses/close" method="POST" style="display: inline;">
-            <button type="submit" class="contrast">Zamknij listę</button>
-        </form>
-        {% elif not is_open %}
-        <article>
-            <header>Proces planowania nie został otwarty</header>
-            Dyrektor (Chief) musi otworzyć proces planowania, zanim będzie można dodawać wydatki.
-        </article>
-        {% else %}
-        <article>
-            <header>Status</header>
-            Lista jest zamknięta. Nie można dodawać nowych wydatków.
-        </article>
+{% block content %}
+<h1>Lista Wydatków</h1>
+<figure>
+    <table role="grid">
+        <thead>
+            <tr>
+                <th scope="col">Rozdział</th>
+                <th scope="col">Nazwa zadania</th>
+                <th scope="col">Potrzeby finansowe (PLN)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+            <tr>
+                <td>{{ expense.chapter }}</td>
+                <td>{{ expense.task_name }}</td>
+                <td>{{ expense.financial_needs }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        {% if expenses_sum %}
+        <tfoot>
+            <tr>
+                <td colspan="2">Suma</td>
+                <td>{{ expenses_sum }}</td>
+            </tr>
+        </tfoot>
         {% endif %}
-        <a href="/" role="button" class="secondary">Powrót do strony głównej</a>
-    </main>
-</body>
-
-</html>
+    </table>
+</figure>
+{% if not closed and is_open %}
+<a href="/expenses/add" role="button">Dodaj nowy wydatek</a>
+<form action="/expenses/close" method="POST" style="display: inline;">
+    <button type="submit" class="contrast">Zamknij listę</button>
+</form>
+{% elif not is_open %}
+<article>
+    <header>Proces planowania nie został otwarty</header>
+    Dyrektor (Chief) musi otworzyć proces planowania, zanim będzie można dodawać wydatki.
+</article>
+{% else %}
+<article>
+    <header>Status</header>
+    Lista jest zamknięta. Nie można dodawać nowych wydatków.
+</article>
+{% endif %}
+<a href="/" role="button" class="secondary">Powrót do strony głównej</a>
+{% endblock %}
