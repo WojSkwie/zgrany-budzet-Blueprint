@@ -39,7 +39,7 @@
                 <th scope="col">Status</th>
                 <th scope="col">Liczba zadań</th>
                 <th scope="col">Suma potrzeb (PLN)</th>
-                <th scope="col">Akcje</th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody>
@@ -56,35 +56,33 @@
                 <td>{{ office.task_count }}</td>
                 <td>{{ office.total_needs }}</td>
                 <td>
-                    <button class="outline" onclick="toggleDetails('{{ office.name }}')">Pokaż szczegóły</button>
+                    <button class="show-office-details outline" office-name="{{ office.name }}">Pokaż szczegóły</button>
                 </td>
             </tr>
-            <tr id="details-{{ office.name }}" style="display: none;">
+            <tr id="details-{{ office.name }}" style="display: none;" class="expense-details">
                 <td colspan="5">
-                    <article>
-                        {% if office.expenses %}
-                        <table role="grid">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Rozdział</th>
-                                    <th scope="col">Nazwa zadania</th>
-                                    <th scope="col">Kwota (PLN)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for expense in office.expenses %}
-                                <tr>
-                                    <td>{{ expense.chapter }}</td>
-                                    <td>{{ expense.task_name }}</td>
-                                    <td>{{ expense.financial_needs }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        {% else %}
-                        <p>Brak wydatków.</p>
-                        {% endif %}
-                    </article>
+                    {% if office.expenses %}
+                    <table role="grid">
+                        <thead>
+                            <tr>
+                                <th scope="col">Rozdział</th>
+                                <th scope="col">Nazwa zadania</th>
+                                <th scope="col">Kwota (PLN)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for expense in office.expenses %}
+                            <tr>
+                                <td>{{ expense.chapter }}</td>
+                                <td>{{ expense.task_name }}</td>
+                                <td>{{ expense.financial_needs }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p>Brak wydatków.</p>
+                    {% endif %}
                 </td>
             </tr>
             {% endfor %}
@@ -97,17 +95,6 @@
             </tr>
         </tfoot>
     </table>
-
-    <script>
-        function toggleDetails(officeName) {
-            var detailsRow = document.getElementById('details-' + officeName);
-            if (detailsRow.style.display === 'none') {
-                detailsRow.style.display = 'table-row';
-            } else {
-                detailsRow.style.display = 'none';
-            }
-        }
-    </script>
 </article>
 
 <a href="/expenses">Lista Wydatków</a>
