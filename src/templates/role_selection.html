@@ -52,11 +52,11 @@
             <label for="role">Wybierz rolę <span style="color: red;">*</span></label>
             <select name="role" id="role" required title="Wybierz rolę, aby przejść do odpowiedniego panelu">
                 <option value="" disabled selected>Wybierz rolę...</option>
+                <option value="{{ CHIEF }}">{{ CHIEF }}</option>
+                <option value="minister">Minister</option>
                 {% for office in OFFICES %}
                 <option value="{{ office }}">{{ office }}</option>
                 {% endfor %}
-                <option value="{{ CHIEF }}">{{ CHIEF }}</option>
-                <option value="minister">Minister</option>
             </select>
             <div class="invalid-feedback">
                 Wybierz rolę, aby przejść do odpowiedniego panelu
