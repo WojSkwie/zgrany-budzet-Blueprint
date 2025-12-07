@@ -31,7 +31,7 @@ def chief_dashboard():
     total_all_needs = 0
     for office in ['office1', 'office2']:
         expenses = EXPENSES.get(office, [])
-        total_needs = sum(e['financial_needs'] for e in expenses if e['financial_needs'] is not None)
+        total_needs = sum(e.financial_needs for e in expenses if e.financial_needs is not None)
         task_count = len(expenses)
         is_submitted = EXPENSES_CLOSED.get(office, False)
         
@@ -66,7 +66,7 @@ def minister_dashboard():
     total_all_needs = 0
     for office in ['office1', 'office2']:
         expenses = EXPENSES.get(office, [])
-        total_needs = sum(e['financial_needs'] for e in expenses if e['financial_needs'] is not None)
+        total_needs = sum(e.financial_needs for e in expenses if e.financial_needs is not None)
         task_count = len(expenses)
         is_submitted = EXPENSES_CLOSED.get(office, False)
         
