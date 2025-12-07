@@ -90,7 +90,7 @@
     <table role="grid">
         <thead>
             <tr>
-                <th scope="col">Biuro</th>
+                <th scope="col">Jednostka</th>
                 <th scope="col">Status</th>
                 <th scope="col">Liczba zadań</th>
                 <th scope="col">Suma potrzeb (tys. zł)</th>
@@ -123,24 +123,134 @@
             <tr id="details-{{ office.name }}" style="display: none;" class="expense-details">
                 <td colspan="5">
                     {% if office.expenses %}
-                    <table role="grid">
-                        <thead>
-                            <tr>
-                                <th scope="col">Rozdział</th>
-                                <th scope="col">Nazwa zadania</th>
-                                <th scope="col">Kwota</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for expense in office.expenses %}
-                            <tr>
-                                <td>{{ expense.chapter }}</td>
-                                <td>{{ expense.task_name }}</td>
-                                <td>{{ expense.financial_needs }} tys. zł</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div
+                        style="overflow-x: auto; overflow-y: visible; scrollbar-width: auto; scrollbar-color: #888 #f1f1f1;">
+                        <style>
+                            /* Column width constraints for details table */
+                            .details-table {
+                                border-collapse: collapse;
+                            }
+
+                            .details-table th,
+                            .details-table td {
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                            }
+
+                            .details-table th {
+                                background-color: #f5f5f5;
+                                font-weight: bold;
+                                border-bottom: 2px solid #888;
+                            }
+
+                            .details-table td:nth-child(1),
+                            .details-table th:nth-child(1) {
+                                /* Rozdział */
+                                min-width: 80px;
+                                max-width: 100px;
+                            }
+
+                            .details-table td:nth-child(2),
+                            .details-table th:nth-child(2) {
+                                /* Departament */
+                                min-width: 100px;
+                                max-width: 120px;
+                            }
+
+                            .details-table td:nth-child(3),
+                            .details-table th:nth-child(3) {
+                                /* Nazwa zadania */
+                                min-width: 200px;
+                                max-width: 300px;
+                                white-space: normal;
+                                word-wrap: break-word;
+                            }
+
+                            .details-table td:nth-child(4),
+                            .details-table th:nth-child(4) {
+                                /* Opis projektu */
+                                min-width: 200px;
+                                max-width: 300px;
+                                white-space: normal;
+                                word-wrap: break-word;
+                            }
+
+                            .details-table td:nth-child(5),
+                            .details-table th:nth-child(5) {
+                                /* Termin realizacji */
+                                min-width: 120px;
+                                max-width: 150px;
+                            }
+
+                            .details-table td:nth-child(6),
+                            .details-table th:nth-child(6),
+                            .details-table td:nth-child(7),
+                            .details-table th:nth-child(7),
+                            .details-table td:nth-child(8),
+                            .details-table th:nth-child(8),
+                            .details-table td:nth-child(9),
+                            .details-table th:nth-child(9),
+                            .details-table td:nth-child(10),
+                            .details-table th:nth-child(10) {
+                                /* Budget years */
+                                min-width: 80px;
+                                max-width: 100px;
+                                text-align: right;
+                            }
+
+                            .details-table td:nth-child(11),
+                            .details-table th:nth-child(11) {
+                                /* Nr umowy */
+                                min-width: 120px;
+                                max-width: 150px;
+                            }
+
+                            .details-table td:nth-child(12),
+                            .details-table th:nth-child(12) {
+                                /* Z kim zawarta */
+                                min-width: 150px;
+                                max-width: 200px;
+                                white-space: normal;
+                                word-wrap: break-word;
+                            }
+                        </style>
+                        <table role="grid" class="details-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Rozdział</th>
+                                    <th scope="col">Departament</th>
+                                    <th scope="col">Nazwa zadania</th>
+                                    <th scope="col">Opis projektu</th>
+                                    <th scope="col">Termin realizacji</th>
+                                    <th scope="col">2025</th>
+                                    <th scope="col">2026</th>
+                                    <th scope="col">2027</th>
+                                    <th scope="col">2028</th>
+                                    <th scope="col">2029</th>
+                                    <th scope="col">Nr umowy</th>
+                                    <th scope="col">Z kim zawarta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for expense in office.expenses %}
+                                <tr>
+                                    <td>{{ expense.chapter }}</td>
+                                    <td>{{ expense.departament or '-' }}</td>
+                                    <td>{{ expense.task_name }}</td>
+                                    <td>{{ expense.opis_projektu or '-' }}</td>
+                                    <td>{{ expense.termin_realizacji or '-' }}</td>
+                                    <td>{{ expense.budget_2025 or '-' }}</td>
+                                    <td>{{ expense.budget_2026 or '-' }}</td>
+                                    <td>{{ expense.budget_2027 or '-' }}</td>
+                                    <td>{{ expense.budget_2028 or '-' }}</td>
+                                    <td>{{ expense.budget_2029 or '-' }}</td>
+                                    <td>{{ expense.nr_umowy or '-' }}</td>
+                                    <td>{{ expense.z_kim_zawarta or '-' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
                     <p>Brak wydatków.</p>
                     {% endif %}

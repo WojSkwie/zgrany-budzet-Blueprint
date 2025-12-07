@@ -125,18 +125,6 @@
                 </form>
             </div>
 
-            <!-- Minister Card -->
-            <div class="role-card">
-                <div class="role-icon">
-                    {{ icons.icon_role_minister() }}
-                </div>
-                <div class="role-title">Ministerstwo</div>
-                <form action="/set_role" method="POST" class="role-form">
-                    <input type="hidden" name="role" value="minister">
-                    <button type="submit">Wybierz</button>
-                </form>
-            </div>
-
             <!-- Office Card -->
             <div class="role-card">
                 <div class="role-icon">
@@ -150,6 +138,18 @@
                         <option value="{{ office }}" {% if loop.first %}selected{% endif %}>{{ office }}</option>
                         {% endfor %}
                     </select>
+                    <button type="submit">Wybierz</button>
+                </form>
+            </div>
+
+            <!-- Minister Card -->
+            <div class="role-card">
+                <div class="role-icon">
+                    {{ icons.icon_role_minister() }}
+                </div>
+                <div class="role-title">Ministerstwo</div>
+                <form action="/set_role" method="POST" class="role-form">
+                    <input type="hidden" name="role" value="minister">
                     <button type="submit">Wybierz</button>
                 </form>
             </div>

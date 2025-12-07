@@ -4,56 +4,147 @@
 {% block content %}
 <h1>Dodaj Wydatek</h1>
 
-
 <form method="POST" class="needs-validation" novalidate>
-    <label for="chapter">
-        Dział <span style="color: red;">*</span>
-        <select id="chapter" name="chapter" hx-get="/fragment/section/chapter" hx-target="#section" required
-            title="Wybierz dział klasyfikacji budżetowej, np. 801 - Oświata">
-            <option value="" selected disabled>Wybierz dział</option>
-            <option value="750">750 - Administracja i bezpieczeństwo</option>
-            <option value="801">801 - Edukacja i wychowanie</option>
-            <option value="851">851 - Ochrona zdrowia</option>
-        </select>
-        <div class="invalid-feedback">
-            Wybierz dział klasyfikacji budżetowej, np. 801 - Oświata
-        </div>
-    </label>
+    <!-- Basic Information -->
+    <fieldset>
+        <legend>Informacje podstawowe</legend>
 
-    <label for="section">
-        Rozdział <span style="color: red;">*</span>
-        <select id="section" name="section" required title="Wybierz rozdział odpowiedni dla wybranego działu">
-            <option value="" selected disabled>Wybierz rozdział</option>
+        <label for="dzial">
+            Dział <span style="color: red;">*</span>
+            <select id="dzial" name="dzial" required title="Wybierz dział budżetowy">
+                <option value="" selected disabled>Wybierz dział</option>
+            </select>
+            <div class="invalid-feedback">
+                Wybierz dział budżetowy
+            </div>
+        </label>
 
-        </select>
-        <div class="invalid-feedback">
-            Wybierz rozdział odpowiedni dla wybranego działu
-        </div>
-    </label>
+        <label for="chapter">
+            Rozdział <span style="color: red;">*</span>
+            <select id="chapter" name="chapter" required title="Wybierz rozdział budżetowy">
+                <option value="" selected disabled>Wybierz rozdział</option>
+            </select>
+            <div class="invalid-feedback">
+                Wybierz rozdział budżetowy
+            </div>
+        </label>
 
-    <label for="task_name">
-        Nazwa zadania <span style="color: red;">*</span>
-        <input type="text" id="task_name" name="task_name" placeholder="Np. Zakup materiałów biurowych" required
-            title="Wpisz krótką, opisową nazwę zadania, np. Remont sali gimnastycznej">
-        <div class="invalid-feedback">
-            Wpisz krótką, opisową nazwę zadania, np. Remont sali gimnastycznej
-        </div>
-    </label>
+        <label for="departament">
+            Departament
+            <input type="text" id="departament" name="departament" placeholder="Np. BA">
+        </label>
 
-    <label for="financial_needs">
-        Potrzeby finansowe (tys. zł) <span style="color: red;">*</span>
-        <input type="number" id="financial_needs" name="financial_needs" placeholder="0" min="0" step="1" required
-            title="Podaj kwotę w tysiącach złotych, np. 50 dla 50 000 zł">
-        <div class="invalid-feedback">
-            Podaj kwotę w tysiącach złotych, np. 50 dla 50 000 zł
+        <label for="task_name">
+            Nazwa zadania <span style="color: red;">*</span>
+            <input type="text" id="task_name" name="task_name" placeholder="Np. Zakup materiałów biurowych" required
+                title="Wpisz krótką, opisową nazwę zadania">
+            <div class="invalid-feedback">
+                Wpisz krótką, opisową nazwę zadania
+            </div>
+        </label>
+
+        <label for="opis_projektu">
+            Opis projektu
+            <textarea id="opis_projektu" name="opis_projektu" rows="3"
+                placeholder="Szczegółowy opis projektu"></textarea>
+        </label>
+
+        <label for="termin_realizacji">
+            Termin realizacji
+            <input type="text" id="termin_realizacji" name="termin_realizacji" placeholder="Np. 24 miesiące">
+        </label>
+    </fieldset>
+
+    <script>
+        // Load classification data
+        fetch('/expenses/api/classifications')
+            .then(response => response.json())
+            .then(data => {
+                const dzialSelect = document.getElementById('dzial');
+                const chapterSelect = document.getElementById('chapter');
+
+                // Populate działów
+                Object.entries(data.dzialy).forEach(([code, name]) => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = `${code}: ${name}`;
+                    dzialSelect.appendChild(option);
+                });
+
+                // Store data for filtering
+                window.rozdzialy = data.rozdzialy;
+                window.dzialRozdzialMapping = data.dzial_rozdzial_mapping;
+
+                // Update rozdziały when dział changes
+                dzialSelect.addEventListener('change', function () {
+                    const selectedDzial = this.value;
+                    chapterSelect.innerHTML = '<option value="" selected disabled>Wybierz rozdział</option>';
+
+                    if (selectedDzial && window.dzialRozdzialMapping[selectedDzial]) {
+                        window.dzialRozdzialMapping[selectedDzial].forEach(rozdzialCode => {
+                            const rozdzialName = window.rozdzialy[rozdzialCode];
+                            if (rozdzialName) {
+                                const option = document.createElement('option');
+                                option.value = rozdzialCode;
+                                option.textContent = `${rozdzialCode}: ${rozdzialName}`;
+                                chapterSelect.appendChild(option);
+                            }
+                        });
+                    }
+                });
+            });
+    </script>
+
+    <!-- Budget (5 years) -->
+    <fieldset>
+        <legend>Budżet (tys. zł)</legend>
+
+        <div class="grid">
+            <label for="budget_2025">
+                2025
+                <input type="number" id="budget_2025" name="budget_2025" placeholder="0" min="0" step="1">
+            </label>
+
+            <label for="budget_2026">
+                2026 <span style="color: red;">*</span>
+                <input type="number" id="budget_2026" name="budget_2026" placeholder="0" min="0" step="1" required
+                    title="Podaj kwotę w tysiącach złotych dla roku 2026">
+                <div class="invalid-feedback">
+                    Podaj kwotę w tysiącach złotych dla roku 2026
+                </div>
+            </label>
+
+            <label for="budget_2027">
+                2027
+                <input type="number" id="budget_2027" name="budget_2027" placeholder="0" min="0" step="1">
+            </label>
+
+            <label for="budget_2028">
+                2028
+                <input type="number" id="budget_2028" name="budget_2028" placeholder="0" min="0" step="1">
+            </label>
+
+            <label for="budget_2029">
+                2029
+                <input type="number" id="budget_2029" name="budget_2029" placeholder="0" min="0" step="1">
+            </label>
         </div>
-    </label>
+    </fieldset>
+
+    <!-- Contract Number -->
+    <fieldset>
+        <legend>Informacje o umowie</legend>
+
+        <label for="nr_umowy">
+            Numer umowy
+            <input type="text" id="nr_umowy" name="nr_umowy" placeholder="Np. 80/BA/24">
+        </label>
+    </fieldset>
 
     <div class="grid">
         <button role="accept" type="submit">Dodaj</button>
         <button role="reject" type="button" onclick="window.history.back()">Anuluj</button>
     </div>
 </form>
-
 
 {% endblock %}
