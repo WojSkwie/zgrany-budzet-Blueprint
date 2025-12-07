@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from src.auth import auth_required
 from .planning_workflow import PlanningState, PlanningStatus
 from src.constants import OFFICES, CHIEF, OFFICES_NAME, OFFICES_SINGLE
+from src.versioning import version_manager
 # from src.expenses import EXPENSES, EXPENSES_CLOSED # Moved to inside functions to avoid circular import
 
 planning_bp = Blueprint('planning', __name__)
@@ -22,8 +23,26 @@ def chief_dashboard():
             else:
                 planning_state.set_deadline(deadline)
                 planning_state.start_planning()
+                # Create snapshot
+                from src.expenses import EXPENSES, EXPENSES_CLOSED
+                version_manager.create_snapshot(
+                    description="Planning started",
+                    user_role=session.get('role', 'Administracja'),
+                    planning_state=planning_state.to_dict(),
+                    expenses=EXPENSES,
+                    expenses_closed=EXPENSES_CLOSED
+                )
         elif action == 'submit_minister':
             planning_state.submit_to_minister()
+            # Create snapshot
+            from src.expenses import EXPENSES, EXPENSES_CLOSED
+            version_manager.create_snapshot(
+                description="Submitted to Ministry",
+                user_role=session.get('role', 'Administracja'),
+                planning_state=planning_state.to_dict(),
+                expenses=EXPENSES,
+                expenses_closed=EXPENSES_CLOSED
+            )
         elif action == 'reopen':
             planning_state.reopen()
             
@@ -60,8 +79,24 @@ def minister_dashboard():
         if action == 'request_correction':
             comment = request.form.get('comment')
             planning_state.request_correction(comment)
+            # Create snapshot
+            version_manager.create_snapshot(
+                description=f"Correction requested: {comment[:50]}",
+                user_role=session.get('role', 'Minister'),
+                planning_state=planning_state.to_dict(),
+                expenses=EXPENSES,
+                expenses_closed=EXPENSES_CLOSED
+            )
         elif action == 'approve':
             planning_state.approve()
+            # Create snapshot
+            version_manager.create_snapshot(
+                description="Planning approved by Ministry",
+                user_role=session.get('role', 'Minister'),
+                planning_state=planning_state.to_dict(),
+                expenses=EXPENSES,
+                expenses_closed=EXPENSES_CLOSED
+            )
             
         return redirect(url_for('planning.minister_dashboard'))
     
@@ -104,12 +139,21 @@ def set_role():
 
 @planning_bp.route('/file_import', methods=["POST"])
 def import_file():
-    from src.expenses import EXPENSES, Expense
+    from src.expenses import EXPENSES, EXPENSES_CLOSED, Expense
     from random import randrange
     from src.expenses import create_expenses
 
     for role, expense_list in EXPENSES.items():
         for new_expense in create_expenses(role, randrange(1, 40)):
             expense_list.append(new_expense)
+    
+    # Create snapshot after import
+    version_manager.create_snapshot(
+        description="Expenses imported from file",
+        user_role=session.get('role', 'Administracja'),
+        planning_state=planning_state.to_dict(),
+        expenses=EXPENSES,
+        expenses_closed=EXPENSES_CLOSED
+    )
 
     return redirect(url_for('planning.chief_dashboard'))

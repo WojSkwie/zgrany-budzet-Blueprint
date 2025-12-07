@@ -4,9 +4,15 @@
 {% block title %}Panel Administracyjny{% endblock %}
 
 {% block content %}
-<h1 class="header-with-icon">{{ icons.icon_role_chief(width=48, height=48) }} Panel Administracji - Planowanie Budżetu
-    na lata {{ state.planning_year }}-{{ state.planning_year + 4 }}
-</h1>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+    <h1 class="header-with-icon">{{ icons.icon_role_chief(width=48, height=48) }} Panel Administracji - Planowanie
+        Budżetu
+        na lata {{ state.planning_year }}-{{ state.planning_year + 4 }}
+    </h1>
+    <a href="{{ url_for('expenses.list_snapshots') }}" role="button" class="secondary" style="margin: 0;">
+        📜 Historia zmian
+    </a>
+</div>
 
 <article>
     {% if state.status == PlanningStatus.NOT_STARTED %}

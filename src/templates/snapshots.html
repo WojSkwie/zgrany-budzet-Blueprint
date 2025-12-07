@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Historia zmian{% endblock %}
+{% block content %}
+<h1>Historia zmian - Rewizje danych</h1>
+
+<article>
+    <p>Poniżej znajduje się lista wszystkich zapisanych wersji danych. Możesz pobrać każdą wersję jako plik JSON lub
+        przywrócić dane do wybranej wersji.</p>
+</article>
+
+{% if snapshots %}
+<figure>
+    <table role="grid">
+        <thead>
+            <tr>
+                <th scope="col">Data i czas</th>
+                <th scope="col">Opis</th>
+                <th scope="col">Użytkownik</th>
+                <th scope="col">Status planowania</th>
+                <th scope="col">Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for snapshot in snapshots %}
+            <tr>
+                <td>{{ snapshot.timestamp }}</td>
+                <td>{{ snapshot.description }}</td>
+                <td>{{ snapshot.user_role }}</td>
+                <td>{{ snapshot.planning_status }}</td>
+                <td>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <a href="{{ url_for('expenses.download_snapshot', snapshot_id=snapshot.id, format='csv') }}"
+                            role="button" class="secondary" style="margin: 0; font-size: 0.9rem; padding: 0.5rem;">
+                            📊 CSV
+                        </a>
+                        <a href="{{ url_for('expenses.download_snapshot', snapshot_id=snapshot.id, format='json') }}"
+                            role="button" class="secondary" style="margin: 0; font-size: 0.9rem; padding: 0.5rem;">
+                            📄 JSON
+                        </a>
+                        <button type="button" class="secondary" style="margin: 0; font-size: 0.9rem; padding: 0.5rem;"
+                            onclick="confirmRevert('{{ snapshot.id }}', '{{ snapshot.timestamp }}')">
+                            ↩️ Przywróć
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</figure>
+{% else %}
+<article>
+    <p>Brak zapisanych wersji danych.</p>
+</article>
+{% endif %}
+
+<div class="grid">
+    <a href="{{ url_for('planning.chief_dashboard') }}" role="button" class="secondary">Powrót do panelu</a>
+</div>
+
+<!-- Confirmation dialog for revert -->
+<dialog id="revert-modal">
+    <article>
+        <header>
+            <button aria-label="Close" rel="prev" onclick="document.getElementById('revert-modal').close()"></button>
+            <p><strong>Potwierdź przywrócenie danych</strong></p>
+        </header>
+        <p id="revert-message">Czy na pewno chcesz przywrócić dane do tej wersji?</p>
+        <footer>
+            <form id="revert-form" method="POST" style="display: inline;">
+                <button type="submit" role="accept">Tak, przywróć</button>
+            </form>
+            <button type="button" class="secondary"
+                onclick="document.getElementById('revert-modal').close()">Anuluj</button>
+        </footer>
+    </article>
+</dialog>
+
+<script>
+    function confirmRevert(snapshotId, timestamp) {
+        const modal = document.getElementById('revert-modal');
+        const form = document.getElementById('revert-form');
+        const message = document.getElementById('revert-message');
+
+        message.textContent = `Czy na pewno chcesz przywrócić dane do wersji z ${timestamp}? Obecny stan zostanie zapisany jako kopia zapasowa.`;
+        form.action = `/expenses/snapshot/${snapshotId}/revert`;
+
+        modal.showModal();
+    }
+</script>
+
+{% endblock %}

@@ -46,3 +46,12 @@ class PlanningState:
 
     def reopen(self):
         self.status = PlanningStatus.NOT_STARTED
+
+    def to_dict(self):
+        """Convert planning state to dictionary for serialization."""
+        return {
+            'status': self.status.value,  # Convert enum to string value
+            'deadline': self.deadline,
+            'correction_comment': self.correction_comment,
+            'planning_year': self.planning_year
+        }

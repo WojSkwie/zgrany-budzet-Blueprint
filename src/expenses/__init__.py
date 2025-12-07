@@ -1,9 +1,16 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, send_file
+from pathlib import Path
+import json
+import random
+
 from src.constants import OFFICES, OFFICES_GENITIVE
+from src.versioning import version_manager
+
 expenses_bp = Blueprint('expenses', __name__)
+
 
 @dataclass
 class Expense:
@@ -125,6 +132,15 @@ def close_expenses():
         
     if 'role' in session and session['role'] in EXPENSES_CLOSED:
         EXPENSES_CLOSED[session['role']] = True
+        
+        # Create snapshot when office submits
+        version_manager.create_snapshot(
+            description=f"Office {session['role']} submitted expenses",
+            user_role=session['role'],
+            planning_state=planning_state.to_dict(),
+            expenses=EXPENSES,
+            expenses_closed=EXPENSES_CLOSED
+        )
     return redirect(url_for('expenses.list_expenses'))
 
 @expenses_bp.route('/')
@@ -196,3 +212,139 @@ def create_expenses(role: str, n: int):
         )
         for exp in selected
     ]
+
+# Snapshot management routes
+@expenses_bp.route('/snapshots')
+def list_snapshots():
+    """List all available snapshots."""
+    snapshots = version_manager.list_snapshots()
+    return render_template('snapshots.html', snapshots=snapshots)
+
+@expenses_bp.route('/snapshot/<snapshot_id>/download/<format>')
+def download_snapshot(snapshot_id, format='json'):
+    """Download a specific snapshot as JSON or CSV file."""
+    import csv
+    import tempfile
+    from datetime import datetime
+    
+    snapshot = version_manager.load_snapshot(snapshot_id)
+    
+    if not snapshot:
+        flash('Snapshot not found!', 'error')
+        return redirect(url_for('expenses.list_snapshots'))
+    
+    if format == 'json':
+        # Download as JSON
+        snapshot_path = version_manager.get_snapshot_file_path(snapshot_id)
+        return send_file(
+            snapshot_path,
+            as_attachment=True,
+            download_name=f"{snapshot_id}.json",
+            mimetype='application/json'
+        )
+    
+    elif format == 'csv':
+        # Create CSV file
+        temp_file = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.csv', newline='', encoding='utf-8')
+        
+        try:
+            writer = csv.writer(temp_file)
+            
+            # Write header
+            writer.writerow([
+                'Office', 'Chapter', 'Department', 'Task Name', 'Description',
+                'Deadline', 'Budget 2025', 'Budget 2026', 'Budget 2027', 
+                'Budget 2028', 'Budget 2029', 'Contract Number'
+            ])
+            
+            # Write expenses data
+            for office, expenses in snapshot.expenses.items():
+                for exp in expenses:
+                    writer.writerow([
+                        office,
+                        exp.get('chapter', ''),
+                        exp.get('departament', ''),
+                        exp.get('task_name', ''),
+                        exp.get('opis_projektu', ''),
+                        exp.get('termin_realizacji', ''),
+                        exp.get('budget_2025', 0),
+                        exp.get('budget_2026', 0),
+                        exp.get('budget_2027', 0),
+                        exp.get('budget_2028', 0),
+                        exp.get('budget_2029', 0),
+                        exp.get('nr_umowy', '')
+                    ])
+            
+            temp_file.close()
+            
+            return send_file(
+                temp_file.name,
+                as_attachment=True,
+                download_name=f"{snapshot_id}.csv",
+                mimetype='text/csv'
+            )
+        except Exception as e:
+            flash(f'Error creating CSV: {str(e)}', 'error')
+            return redirect(url_for('expenses.list_snapshots'))
+    
+    else:
+        flash('Invalid format!', 'error')
+        return redirect(url_for('expenses.list_snapshots'))
+
+@expenses_bp.route('/snapshot/<snapshot_id>/revert', methods=['POST'])
+def revert_snapshot(snapshot_id):
+    """Revert to a specific snapshot."""
+    from src.planning import planning_state
+    
+    # Create a backup snapshot before reverting
+    version_manager.create_snapshot(
+        description=f"Backup before reverting to {snapshot_id}",
+        user_role=session.get('role', 'Unknown'),
+        planning_state=planning_state.to_dict(),
+        expenses=EXPENSES,
+        expenses_closed=EXPENSES_CLOSED
+    )
+    
+    # Load the snapshot
+    snapshot = version_manager.load_snapshot(snapshot_id)
+    
+    if not snapshot:
+        flash('Snapshot not found!', 'error')
+        return redirect(url_for('expenses.list_snapshots'))
+    
+    # Restore the data
+    try:
+        # Restore expenses
+        for role in EXPENSES.keys():
+            EXPENSES[role].clear()
+        
+        for role, expense_list in snapshot.expenses.items():
+            EXPENSES[role] = [
+                Expense(**exp_data) for exp_data in expense_list
+            ]
+        
+        # Restore expenses_closed
+        for role in EXPENSES_CLOSED.keys():
+            EXPENSES_CLOSED[role] = snapshot.expenses_closed.get(role, False)
+        
+        # Restore planning state
+        from src.planning.planning_workflow import PlanningStatus
+        
+        # Convert status string back to enum
+        status_value = snapshot.planning_state.get('status')
+        if status_value:
+            # Find the enum member by value
+            for status in PlanningStatus:
+                if status.value == status_value:
+                    planning_state.status = status
+                    break
+        
+        planning_state.deadline = snapshot.planning_state.get('deadline')
+        planning_state.correction_comment = snapshot.planning_state.get('correction_comment')
+        planning_state.planning_year = snapshot.planning_state.get('planning_year', 2026)
+        
+        flash(f'Successfully reverted to snapshot from {snapshot.timestamp}', 'success')
+    except Exception as e:
+        flash(f'Error reverting snapshot: {str(e)}', 'error')
+    
+    return redirect(url_for('planning.chief_dashboard'))
