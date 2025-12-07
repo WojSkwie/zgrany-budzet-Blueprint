@@ -28,7 +28,7 @@
         <form method="POST">
             <button type="submit" role="accept" name="action" value="approve">Zatwierdź</button>
         </form>
-        <button type="button" class="secondary" onclick="openCorrectionModal()">Zleć korektę</button>
+        <button role="reject" type="button" class="secondary" onclick="openCorrectionModal()">Zleć korektę</button>
     </div>
 
     <dialog id="correction-modal">
@@ -48,7 +48,7 @@
                             onclick="closeCorrectionModal()">Anuluj</button>
                     </div>
                     <div>
-                        <button type="submit" role="button accept" name="action accept" value="request_correction">Wyślij</button>
+                        <button type="submit" role="button accept" name="action" value="request_correction">Wyślij</button>
                     </div>
                 </footer>
             </form>

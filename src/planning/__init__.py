@@ -58,6 +58,7 @@ def minister_dashboard():
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'request_correction':
+            print("LELEO")
             comment = request.form.get('comment')
             planning_state.request_correction(comment)
         elif action == 'approve':
