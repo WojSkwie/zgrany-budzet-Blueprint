@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "icons.html" as icons %}
 
 {% block title %}Panel Ministerstwa{% endblock %}
 
@@ -7,11 +8,20 @@
 
 <article>
     {% if state.status == PlanningStatus.NOT_STARTED %}
-    <strong style="color: gray;">PLANOWANIE NIE ROZPOCZĘTE</strong>
+    <strong style="color: gray; display: inline-flex; align-items: center; gap: 0.5rem;">
+        {{ icons.icon_planning_not_started() }}
+        PLANOWANIE NIE ROZPOCZĘTE
+    </strong>
     {% elif state.status == PlanningStatus.IN_PROGRESS %}
-    <strong style="color: rgb(4, 4, 204);">PLANOWANIE W TOKU</strong>
+    <strong style="color: rgb(4, 4, 204); display: inline-flex; align-items: center; gap: 0.5rem;">
+        {{ icons.icon_planning_in_progress() }}
+        PLANOWANIE W TOKU
+    </strong>
     {% elif state.status == PlanningStatus.IN_REVIEW %}
-    <strong style="color: yellow;">DO ZATWIERDZENIA</strong>
+    <strong style="color: yellow; display: inline-flex; align-items: center; gap: 0.5rem;">
+        {{ icons.icon_planning_in_review() }}
+        DO ZATWIERDZENIA
+    </strong>
     <hr />
     <div class="grid">
         <form method="POST">
@@ -22,9 +32,15 @@
         </form>
     </div>
     {% elif state.status == PlanningStatus.NEEDS_CORRECTION %}
-    <strong style="color: orange;">POTRZEBUJE KOREKTY</strong>
+    <strong style="color: orange; display: inline-flex; align-items: center; gap: 0.5rem;">
+        {{ icons.icon_planning_needs_correction() }}
+        POTRZEBUJE KOREKTY
+    </strong>
     {% elif state.status == PlanningStatus.FINISHED%}
-    <strong style="color: green;">PLANOWANIE ZAKOŃCZONE</strong>
+    <strong style="color: green; display: inline-flex; align-items: center; gap: 0.5rem;">
+        {{ icons.icon_planning_finished() }}
+        PLANOWANIE ZAKOŃCZONE
+    </strong>
     {% endif %}
 </article>
 
@@ -46,9 +62,15 @@
                 <td>{{ office.name }}</td>
                 <td>
                     {% if office.status == 'Submitted' %}
-                    <strong style="color: green;">Zatwierdzony</strong>
+                    <strong style="color: green; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        {{ icons.icon_office_submitted() }}
+                        Zatwierdzony
+                    </strong>
                     {% else %}
-                    <strong style="color: orange;">W trakcie</strong>
+                    <strong style="color: orange; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        {{ icons.icon_office_in_progress() }}
+                        W trakcie
+                    </strong>
                     {% endif %}
                 </td>
                 <td>{{ office.task_count }}</td>
