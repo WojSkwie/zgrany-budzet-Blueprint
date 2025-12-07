@@ -81,3 +81,15 @@
     animation: fadeOut 6s forwards;
     /* Fade out after 4 seconds */
 }
+
+button.halfsize {
+    width: 50%;
+}
+
+button.center {
+    justify-self: center;
+}
+
+form.centered {
+    display: grid;
+}
