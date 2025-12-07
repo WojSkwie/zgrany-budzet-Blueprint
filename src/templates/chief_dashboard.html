@@ -51,9 +51,17 @@
         POTRZEBA KOREKTY
     </strong>
     {% elif state.status == PlanningStatus.FINISHED%}
-    <form method="POST" class="centered">
-        <button type="submit" name="action" value="reopen" class="primary halfsize center">Nowe planowanie</button>
-    </form>
+    <div class="grid">
+        <div>
+            <strong style="color: green; display: inline-flex; align-items: center; gap: 0.5rem;">
+                {{ icons.icon_planning_finished() }}
+                PLANOWANIE ZAKOŃCZONE
+            </strong>
+        </div>
+        <form method="POST">
+            <button type="submit" name="action" value="reopen" class="primary">Nowe planowanie</button>
+        </form>
+    </div>
     {% endif %}
 </article>
 
