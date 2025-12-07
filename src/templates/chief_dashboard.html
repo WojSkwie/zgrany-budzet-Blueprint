@@ -153,11 +153,26 @@
 
 <article>
     <header>Import z pliku</header>
-    <form action="/file_import" method="POST">
-        <div class="grid">
-            <input required type="file" class="secondary" />
-            <button type="submit" class="secondary">Pobierz dane z pliku</button>
-        </div>
+    <form action="/file_import" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <fieldset {% if state.status !=PlanningStatus.IN_PROGRESS %}disabled{% endif %}
+            style="border: none; padding: 0; margin: 0;">
+            <div class="grid">
+                <div class="file-input-wrapper"
+                    style="display: flex; align-items: center; gap: 1rem; position: relative;">
+                    <input type="file" id="file-upload" name="file" required class="file-input"
+                        title="Wybierz plik do importu"
+                        onchange="document.getElementById('file-name').textContent = this.files[0] ? this.files[0].name : 'Brak wybranego pliku'"
+                        style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0;">
+                    <label for="file-upload" class="secondary" role="button" style="margin-bottom: 0;">Wybierz
+                        plik</label>
+                    <span id="file-name" style="font-style: italic;">Brak wybranego pliku</span>
+                    <div class="invalid-feedback" style="top: 100%; margin-top: 0.5rem;">
+                        Wybierz plik do importu
+                    </div>
+                </div>
+                <button type="submit" class="secondary">Pobierz dane z pliku</button>
+            </div>
+        </fieldset>
     </form>
 </article>
 

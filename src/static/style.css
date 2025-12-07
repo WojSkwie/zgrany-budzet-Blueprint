@@ -80,6 +80,19 @@
     /* Fade out after 4 seconds */
 }
 
+/* File Input Validation */
+.was-validated .file-input:invalid~label {
+    border-color: var(--pico-color-red-500);
+    color: var(--pico-color-red-500);
+    border-width: 2px;
+    border-style: solid;
+}
+
+.was-validated .file-input:invalid~label:hover {
+    background-color: var(--pico-color-red-600);
+    color: white;
+}
+
 button.halfsize {
     width: 50%;
 }
