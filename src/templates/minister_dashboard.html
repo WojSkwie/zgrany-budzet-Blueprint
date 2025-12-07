@@ -24,6 +24,7 @@
         DO ZATWIERDZENIA
     </strong>
     <hr />
+
     <div class="grid">
         <form method="POST">
             <button type="submit" role="accept" name="action" value="approve">Zatwierdź</button>
@@ -48,7 +49,8 @@
                             onclick="closeCorrectionModal()">Anuluj</button>
                     </div>
                     <div>
-                        <button type="submit" role="button accept" name="action" value="request_correction">Wyślij</button>
+                        <button type="submit" role="button accept" name="action"
+                            value="request_correction">Wyślij</button>
                     </div>
                 </footer>
             </form>
@@ -60,6 +62,9 @@
         {{ icons.icon_planning_needs_correction() }}
         POTRZEBUJE KOREKTY
     </strong>
+    {% if state.correction_comment %}
+    <p><strong>Wysłano komentarz:</strong> {{ state.correction_comment }}</p>
+    {% endif %}
     {% elif state.status == PlanningStatus.FINISHED%}
     <strong style="color: green; display: inline-flex; align-items: center; gap: 0.5rem;">
         {{ icons.icon_planning_finished() }}

@@ -45,7 +45,7 @@ def chief_dashboard():
             'status': 'Submitted' if is_submitted else 'Open',
             'total_needs': total_needs,
             'task_count': task_count,
-            'expenses': expenses
+            'expenses': expenses,
         })
 
     return render_template('chief_dashboard.html', state=planning_state, offices_status=offices_status, total_all_needs=total_all_needs, PlanningStatus=PlanningStatus)
@@ -58,7 +58,6 @@ def minister_dashboard():
     if request.method == 'POST':
         action = request.form.get('action')
         if action == 'request_correction':
-            print("LELEO")
             comment = request.form.get('comment')
             planning_state.request_correction(comment)
         elif action == 'approve':
