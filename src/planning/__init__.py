@@ -45,7 +45,7 @@ def chief_dashboard():
             'status': 'Submitted' if is_submitted else 'Open',
             'total_needs': total_needs,
             'task_count': task_count,
-            'expenses': expenses
+            'expenses': expenses,
         })
 
     return render_template('chief_dashboard.html', state=planning_state, offices_status=offices_status, total_all_needs=total_all_needs, PlanningStatus=PlanningStatus)

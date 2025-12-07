@@ -12,6 +12,7 @@ class PlanningState:
         self.deadline = None
         self.status = PlanningStatus.NOT_STARTED
         self.correction_comment = None
+        self.planning_year = 2025
 
     def set_deadline(self, date_str):
         self.deadline = date_str
@@ -41,6 +42,7 @@ class PlanningState:
 
     def approve(self):
         self.status = PlanningStatus.FINISHED
+        self.planning_year += 1
 
     def reopen(self):
         self.status = PlanningStatus.NOT_STARTED

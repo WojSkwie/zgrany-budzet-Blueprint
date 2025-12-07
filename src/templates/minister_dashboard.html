@@ -5,6 +5,7 @@
 
 {% block content %}
 <h1 class="header-with-icon">{{ icons.icon_role_minister(width=48, height=48) }} Panel Ministerstwa - Planowanie Budżetu
+    na lata {{ state.planning_year }}-{{ state.planning_year + 4 }}
 </h1>
 
 <article>
@@ -24,11 +25,12 @@
         DO ZATWIERDZENIA
     </strong>
     <hr />
+
     <div class="grid">
         <form method="POST">
             <button type="submit" role="accept" name="action" value="approve">Zatwierdź</button>
         </form>
-        <button type="button" class="secondary" onclick="openCorrectionModal()">Zleć korektę</button>
+        <button role="reject" type="button" class="secondary" onclick="openCorrectionModal()">Zleć korektę</button>
     </div>
 
     <dialog id="correction-modal">
@@ -61,6 +63,9 @@
         {{ icons.icon_planning_needs_correction() }}
         POTRZEBUJE KOREKTY
     </strong>
+    {% if state.correction_comment %}
+    <p><strong>Wysłano komentarz:</strong> {{ state.correction_comment }}</p>
+    {% endif %}
     {% elif state.status == PlanningStatus.FINISHED%}
     <strong style="color: green; display: inline-flex; align-items: center; gap: 0.5rem;">
         {{ icons.icon_planning_finished() }}
