@@ -37,30 +37,3 @@ jobs:
       run: |
         make lint
         make test
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4.3.1
-      with:
-        aws-region: eu-central-1
-        role-to-assume: arn:aws:iam::513532022998:role/gh-actions-role
-        role-session-name: gh-actions-session
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build and push docker image
-      id: build-image
-      env:
-        IMAGE_TAG: "513532022998.dkr.ecr.eu-central-1.amazonaws.com/hackaton/webapp:latest"
-      run: |
-        docker buildx build --platform linux/amd64 --provenance=false -t ${IMAGE_TAG} .
-        docker push ${IMAGE_TAG}
-
-    - name: Deploy to Amazon ECS
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-      with:
-        task-definition: aws/ecs-task.yaml
-        service: webapp-358f
-        cluster: default
-        wait-for-service-stability: true
