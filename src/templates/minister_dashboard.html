@@ -13,6 +13,8 @@
     <strong style="color: gray; display: inline-flex; align-items: center; gap: 0.5rem;">
         {{ icons.icon_planning_not_started() }}
         PLANOWANIE NIE ROZPOCZĘTE
+        <hr>
+        <button role="accept" type="button" class="secondary" onclick="openCorrectionModal()">Daj wytyczne</button>
     </strong>
     {% elif state.status == PlanningStatus.IN_PROGRESS %}
     <strong style="color: rgb(4, 4, 204); display: inline-flex; align-items: center; gap: 0.5rem;">
@@ -33,44 +35,21 @@
         <button role="reject" type="button" class="secondary" onclick="openCorrectionModal()">Zleć korektę</button>
     </div>
 
-    <dialog id="correction-modal">
-        <article>
-            <header>
-                <button aria-label="Close" rel="prev" onclick="closeCorrectionModal()"></button>
-                <p><strong>Zleć korektę</strong></p>
-            </header>
-            <form method="POST">
-                <p>
-                    <label for="comment">Komentarz do korekty:</label>
-                    <textarea id="comment" name="comment" placeholder="Wpisz powód korekty..." required></textarea>
-                </p>
-                <footer class="grid">
-                    <div>
-                        <button type="button" role="button reject" class="secondary" style="width: 100%;"
-                            onclick="closeCorrectionModal()">Anuluj</button>
-                    </div>
-                    <div>
-                        <button type="submit" role="button accept" name="action accept"
-                            value="request_correction">Wyślij</button>
-                    </div>
-                </footer>
-            </form>
-        </article>
-    </dialog>
     </div>
     {% elif state.status == PlanningStatus.NEEDS_CORRECTION %}
     <strong style="color: orange; display: inline-flex; align-items: center; gap: 0.5rem;">
         {{ icons.icon_planning_needs_correction() }}
         POTRZEBUJE KOREKTY
     </strong>
-    {% if state.correction_comment %}
-    <p><strong>Wysłano komentarz:</strong> {{ state.correction_comment }}</p>
-    {% endif %}
     {% elif state.status == PlanningStatus.FINISHED%}
     <strong style="color: green; display: inline-flex; align-items: center; gap: 0.5rem;">
         {{ icons.icon_planning_finished() }}
         PLANOWANIE ZAKOŃCZONE
     </strong>
+    {% endif %}
+
+    {% if state.correction_comment %}
+    <p><strong>Wysłano komentarz:</strong> {{ state.correction_comment }}</p>
     {% endif %}
 </article>
 
@@ -148,6 +127,31 @@
             </tr>
         </tfoot>
     </table>
+
+    <dialog id="correction-modal">
+        <article>
+            <header>
+                <button aria-label="Close" rel="prev" onclick="closeCorrectionModal()"></button>
+                <p><strong>Zleć korektę/daj wytyczne</strong></p>
+            </header>
+            <form method="POST">
+                <p>
+                    <label for="comment">Komentarz:</label>
+                    <textarea id="comment" name="comment" placeholder="Wpisz wytyczne..." required></textarea>
+                </p>
+                <footer class="grid">
+                    <div>
+                        <button type="button" role="button reject" class="secondary" style="width: 100%;"
+                            onclick="closeCorrectionModal()">Anuluj</button>
+                    </div>
+                    <div>
+                        <button type="submit" role="button accept" name="action"
+                            value="request_correction">Wyślij</button>
+                    </div>
+                </footer>
+            </form>
+        </article>
+    </dialog>
 
     <script>
         function toggleDetails(officeName) {

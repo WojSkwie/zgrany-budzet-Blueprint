@@ -19,7 +19,6 @@ class PlanningState:
 
     def start_planning(self):
         self.status = PlanningStatus.IN_PROGRESS
-        self.correction_comment = None
         # Side effect: Reset office approvals
         from expenses import EXPENSES_CLOSED
         for office in EXPENSES_CLOSED:
@@ -33,8 +32,10 @@ class PlanningState:
             EXPENSES_CLOSED[office] = True
 
     def request_correction(self, comment=None):
-        self.status = PlanningStatus.NEEDS_CORRECTION
         self.correction_comment = comment
+        if self.status != PlanningStatus.IN_REVIEW:
+            return
+        self.status = PlanningStatus.NEEDS_CORRECTION
         # Side effect: Reset office approvals
         from expenses import EXPENSES_CLOSED
         for office in EXPENSES_CLOSED:
@@ -42,6 +43,7 @@ class PlanningState:
 
     def approve(self):
         self.status = PlanningStatus.FINISHED
+        self.correction_comment = None
         self.planning_year += 1
 
     def reopen(self):
