@@ -28,10 +28,32 @@
         <form method="POST">
             <button type="submit" role="accept" name="action" value="approve">Zatwierdź</button>
         </form>
-        <form method="POST">
-            <button type="submit" role="reject" name="action" value="request_correction" class="secondary">Zleć
-                korektę</button>
-        </form>
+        <button type="button" class="secondary" onclick="openCorrectionModal()">Zleć korektę</button>
+    </div>
+
+    <dialog id="correction-modal">
+        <article>
+            <header>
+                <button aria-label="Close" rel="prev" onclick="closeCorrectionModal()"></button>
+                <p><strong>Zleć korektę</strong></p>
+            </header>
+            <form method="POST">
+                <p>
+                    <label for="comment">Komentarz do korekty:</label>
+                    <textarea id="comment" name="comment" placeholder="Wpisz powód korekty..." required></textarea>
+                </p>
+                <footer class="grid">
+                    <div>
+                        <button type="button" role="button reject" class="secondary" style="width: 100%;"
+                            onclick="closeCorrectionModal()">Anuluj</button>
+                    </div>
+                    <div>
+                        <button type="submit" role="button accept" name="action accept" value="request_correction">Wyślij</button>
+                    </div>
+                </footer>
+            </form>
+        </article>
+    </dialog>
     </div>
     {% elif state.status == PlanningStatus.NEEDS_CORRECTION %}
     <strong style="color: orange; display: inline-flex; align-items: center; gap: 0.5rem;">
@@ -129,6 +151,16 @@
             } else {
                 detailsRow.style.display = 'none';
             }
+        }
+
+        const modal = document.getElementById('correction-modal');
+
+        function openCorrectionModal() {
+            modal.showModal();
+        }
+
+        function closeCorrectionModal() {
+            modal.close();
         }
     </script>
 </article>
