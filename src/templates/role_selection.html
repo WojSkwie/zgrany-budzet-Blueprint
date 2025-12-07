@@ -148,7 +148,7 @@
                     <select name="role" required>
                         <option value="" disabled selected>Wybierz {{ OFFICES_SINGLE }}...</option>
                         {% for office in OFFICES %}
-                        <option value="{{ office }}">{{ office }}</option>
+                        <option value="{{ office }}" {% if loop.first %}selected{% endif %}>{{ office }}</option>
                         {% endfor %}
                     </select>
                     <button type="submit">Wybierz</button>
