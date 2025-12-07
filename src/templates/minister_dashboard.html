@@ -55,8 +55,8 @@
                 <td>{{ office.total_needs }}</td>
                 <td>
                     <button class="outline" onclick="toggleDetails('{{ office.name }}')">Pokaż szczegóły</button>
-                    <button class="outline" onclick="acceptOfficeExpenses('{{ office.name }}')">TAK</button>
-                    <button class="outline" onclick="rejectOfficeExpenses('{{ office.name }}')">NIE</button>
+                    <button class="outline" onclick="acceptOfficeExpenses('{{ office.name }}')">Zaakceptuj</button>
+                    <button class="outline" onclick="rejectOfficeExpenses('{{ office.name }}')">Odrzuć</button>
                 </td>
             </tr>
             <tr id="details-{{ office.name }}" style="display: none;">
