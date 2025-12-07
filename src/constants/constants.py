@@ -52,6 +52,6 @@ OFFICES_GENITIVE = {
     OFFICE16: OFFICE16_GENITIVE,
 }
 
-CHIEF = 'Dyrektor'
+CHIEF = 'Administracja'
 OFFICES_NAME = 'Jednostki'
 OFFICES_SINGLE = 'Jednostka'

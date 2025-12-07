@@ -42,17 +42,21 @@
 </figure>
 {% if state.status == PlanningStatus.NOT_STARTED %}
 <article>
-    <header>Proces planowania nie został otwarty</header>
-    Dyrektor (Chief) musi otworzyć proces planowania, zanim będzie można dodawać wydatki.
+    <header style="font-weight: bold;">Proces planowania nie został otwarty</header>
+    Administracja musi otworzyć proces planowania, zanim będzie można dodawać wydatki.
 </article>
 {% elif state.status == PlanningStatus.IN_REVIEW %}
 <article>
-    <header>Status</header>
+    <header style="font-weight: bold; color: green; align-items: center; gap: 0.5rem; background: none;">
+        Wysłane {{ icons.icon_planning_in_review() }}
+    </header>
     Proces jest w trakcie przeglądu przez Ministerstwo. Nie można dodawać nowych wydatków.
 </article>
 {% elif closed %}
 <article>
-    <header>Status</header>
+    <header style="font-weight: bold; color: green; align-items: center; gap: 0.5rem; background: none;">
+        Wysłane {{ icons.icon_office_submitted() }}
+    </header>
     Lista jest zamknięta. Nie można dodawać nowych wydatków.
 </article>
 {% else %}
